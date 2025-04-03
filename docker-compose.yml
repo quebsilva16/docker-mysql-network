@@ -1,0 +1,35 @@
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    container_name: mysql_shared 
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  # Solo contraseña root
+      # ¡Sin MYSQL_DATABASE, MYSQL_USER, etc.!
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"  # Para acceso desde host u otros contenedores
+    networks:
+      - shared
+    
+
+  adminer:  # 🆕 Servicio Adminer
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql  # ✨ Se conecta automáticamente al servicio MySQL
+    networks:
+      - shared
+    depends_on:
+      - mysql
+
+networks:
+  shared:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
